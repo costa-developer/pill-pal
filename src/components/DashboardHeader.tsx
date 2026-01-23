@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Pill, LogOut, User, Calendar, BarChart3 } from 'lucide-react';
+import { Pill, LogOut, User, Calendar, BarChart3, FileText } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Today', icon: Calendar },
   { href: '/history', label: 'History', icon: BarChart3 },
+  { href: '/reports', label: 'Reports', icon: FileText },
 ];
 
 export function DashboardHeader() {
