@@ -9,6 +9,9 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import Reports from "./pages/Reports";
+import Sharing from "./pages/Sharing";
+import DoctorAuth from "./pages/DoctorAuth";
+import DoctorPortal from "./pages/DoctorPortal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +29,9 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/history" element={<History />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/sharing" element={<Sharing />} />
+            <Route path="/doctor/auth" element={<DoctorAuth />} />
+            <Route path="/doctor" element={<DoctorPortal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

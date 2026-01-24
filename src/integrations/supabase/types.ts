@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_keys: {
+        Row: {
+          created_at: string
+          id: string
+          key_hash: string
+          key_preview: string
+          label: string | null
+          last_used_at: string | null
+          revoked_at: string | null
+          status: string
+          use_count: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key_hash: string
+          key_preview: string
+          label?: string | null
+          last_used_at?: string | null
+          revoked_at?: string | null
+          status?: string
+          use_count?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key_hash?: string
+          key_preview?: string
+          label?: string | null
+          last_used_at?: string | null
+          revoked_at?: string | null
+          status?: string
+          use_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       medication_logs: {
         Row: {
           created_at: string
@@ -136,15 +175,83 @@ export type Database = {
         }
         Relationships: []
       }
+      report_access_logs: {
+        Row: {
+          access_key_id: string | null
+          accessed_at: string
+          doctor_user_id: string | null
+          id: string
+          ip_address: string | null
+          patient_user_id: string
+          report_type: string
+          user_agent: string | null
+        }
+        Insert: {
+          access_key_id?: string | null
+          accessed_at?: string
+          doctor_user_id?: string | null
+          id?: string
+          ip_address?: string | null
+          patient_user_id: string
+          report_type: string
+          user_agent?: string | null
+        }
+        Update: {
+          access_key_id?: string | null
+          accessed_at?: string
+          doctor_user_id?: string | null
+          id?: string
+          ip_address?: string | null
+          patient_user_id?: string
+          report_type?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_access_logs_access_key_id_fkey"
+            columns: ["access_key_id"]
+            isOneToOne: false
+            referencedRelation: "access_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "patient" | "doctor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -271,6 +378,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["patient", "doctor"],
+    },
   },
 } as const
