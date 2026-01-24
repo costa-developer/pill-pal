@@ -172,6 +172,7 @@ export default function Dashboard() {
                         time={time}
                         instructions={med.instructions || undefined}
                         color={med.color || undefined}
+                        medicationType={med.medication_type as 'one-time' | 'prescription' | 'as-needed'}
                         isTaken={isTakenToday(med.id, time)}
                         onMarkTaken={handleMarkTaken}
                         onEdit={handleEdit}

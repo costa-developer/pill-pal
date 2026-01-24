@@ -6,9 +6,13 @@ export interface MedicationStat {
   name: string;
   dosage: string;
   frequency: string;
-  expected: number;
+  type: 'prescription' | 'one-time' | 'as-needed';
+  expected: number | null;
   taken: number;
-  adherence: number;
+  adherence: number | null;
+  durationDays: number | null;
+  startDate: string | null;
+  endDate: string | null;
 }
 
 export interface LogEntry {
@@ -30,6 +34,9 @@ export interface ReportData {
   startDate: string;
   endDate: string;
   totalMedications: number;
+  prescriptionCount: number;
+  oneTimeCount: number;
+  asNeededCount: number;
   expectedDoses: number;
   takenDoses: number;
   missedDoses: number;

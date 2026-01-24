@@ -16,11 +16,18 @@ interface MedicationCardProps {
   time: string;
   instructions?: string;
   color?: string;
+  medicationType?: 'one-time' | 'prescription' | 'as-needed';
   isTaken?: boolean;
   onMarkTaken: (id: string, time: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }
+
+const TYPE_LABELS: Record<string, { label: string; className: string }> = {
+  'one-time': { label: 'One-time', className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' },
+  'prescription': { label: 'Prescription', className: 'bg-primary/10 text-primary' },
+  'as-needed': { label: 'As Needed', className: 'bg-secondary text-secondary-foreground' },
+};
 
 export function MedicationCard({
   id,
@@ -29,12 +36,14 @@ export function MedicationCard({
   time,
   instructions,
   color = '#0077b6',
+  medicationType = 'prescription',
   isTaken = false,
   onMarkTaken,
   onEdit,
   onDelete,
 }: MedicationCardProps) {
   const [isAnimating, setIsAnimating] = useState(false);
+  const typeInfo = TYPE_LABELS[medicationType] || TYPE_LABELS.prescription;
 
   const handleMarkTaken = () => {
     if (!isTaken) {
@@ -73,7 +82,12 @@ export function MedicationCard({
           {/* Info */}
           <div>
             <h3 className="font-display font-semibold text-lg text-foreground">{name}</h3>
-            <p className="text-muted-foreground">{dosage}</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <p className="text-muted-foreground">{dosage}</p>
+              <span className={cn("text-xs px-2 py-0.5 rounded-full font-medium", typeInfo.className)}>
+                {typeInfo.label}
+              </span>
+            </div>
             {instructions && (
               <p className="text-sm text-muted-foreground mt-1">{instructions}</p>
             )}

@@ -25,6 +25,10 @@ interface Medication {
   dosage: string;
   frequency: string;
   time_of_day: string[];
+  medication_type: string;
+  duration_days: number | null;
+  start_date: string | null;
+  end_date: string | null;
 }
 
 serve(async (req) => {
@@ -78,17 +82,46 @@ serve(async (req) => {
 
     if (logsError) throw logsError;
 
-    // Calculate statistics
+    // Calculate statistics - exclude one-time and as-needed medications from adherence
+    const trackableMedications = medications?.filter((med: Medication) => 
+      med.medication_type === 'prescription'
+    ) || [];
+    
+    const oneTimeMedications = medications?.filter((med: Medication) => 
+      med.medication_type === 'one-time'
+    ) || [];
+    
+    const asNeededMedications = medications?.filter((med: Medication) => 
+      med.medication_type === 'as-needed'
+    ) || [];
+
     const totalMedications = medications?.length || 0;
     const periodDays = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
     
-    // Calculate expected doses
+    // Calculate expected doses only for trackable prescriptions
     let expectedDoses = 0;
-    medications?.forEach((med: Medication) => {
-      expectedDoses += (med.time_of_day?.length || 1) * periodDays;
+    trackableMedications.forEach((med: Medication) => {
+      // Calculate days this medication was active during the period
+      const medStart = med.start_date ? new Date(med.start_date) : new Date(0);
+      const medEnd = med.end_date ? new Date(med.end_date) : new Date(endDate);
+      const periodStart = new Date(startDate);
+      const periodEnd = new Date(endDate);
+      
+      // Find overlap between medication period and report period
+      const overlapStart = new Date(Math.max(medStart.getTime(), periodStart.getTime()));
+      const overlapEnd = new Date(Math.min(medEnd.getTime(), periodEnd.getTime()));
+      
+      if (overlapStart <= overlapEnd) {
+        const activeDays = Math.ceil((overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        expectedDoses += (med.time_of_day?.length || 1) * activeDays;
+      }
     });
 
-    const takenDoses = logs?.filter((log: MedicationLog) => log.status === 'taken').length || 0;
+    const takenDoses = logs?.filter((log: MedicationLog) => 
+      log.status === 'taken' && 
+      trackableMedications.some((med: Medication) => med.id === log.medication_id)
+    ).length || 0;
+    
     const adherenceRate = expectedDoses > 0 ? Math.round((takenDoses / expectedDoses) * 100) : 0;
 
     // Group logs by medication
@@ -100,20 +133,75 @@ serve(async (req) => {
       logsByMedication[log.medication_id].push(log);
     });
 
-    // Calculate per-medication adherence
-    const medicationStats = medications?.map((med: Medication) => {
+    // Calculate per-medication adherence (only for prescriptions)
+    const medicationStats = trackableMedications.map((med: Medication) => {
       const medLogs = logsByMedication[med.id] || [];
-      const medExpected = (med.time_of_day?.length || 1) * periodDays;
+      
+      // Calculate active days for this medication
+      const medStart = med.start_date ? new Date(med.start_date) : new Date(0);
+      const medEnd = med.end_date ? new Date(med.end_date) : new Date(endDate);
+      const periodStart = new Date(startDate);
+      const periodEnd = new Date(endDate);
+      
+      const overlapStart = new Date(Math.max(medStart.getTime(), periodStart.getTime()));
+      const overlapEnd = new Date(Math.min(medEnd.getTime(), periodEnd.getTime()));
+      
+      let medExpected = 0;
+      if (overlapStart <= overlapEnd) {
+        const activeDays = Math.ceil((overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        medExpected = (med.time_of_day?.length || 1) * activeDays;
+      }
+      
       const medTaken = medLogs.filter((l: MedicationLog) => l.status === 'taken').length;
       return {
         name: med.name,
         dosage: med.dosage,
         frequency: med.frequency,
+        type: 'prescription',
         expected: medExpected,
         taken: medTaken,
         adherence: medExpected > 0 ? Math.round((medTaken / medExpected) * 100) : 0,
+        durationDays: med.duration_days,
+        startDate: med.start_date,
+        endDate: med.end_date,
       };
     }) || [];
+
+    // Add one-time medications to stats (not counted in adherence)
+    const oneTimeStats = oneTimeMedications.map((med: Medication) => {
+      const medLogs = logsByMedication[med.id] || [];
+      return {
+        name: med.name,
+        dosage: med.dosage,
+        frequency: 'One-time',
+        type: 'one-time',
+        expected: 1,
+        taken: medLogs.filter((l: MedicationLog) => l.status === 'taken').length,
+        adherence: null, // Not applicable for one-time
+        durationDays: 1,
+        startDate: med.start_date,
+        endDate: med.end_date,
+      };
+    });
+
+    // Add as-needed medications to stats (not counted in adherence)
+    const asNeededStats = asNeededMedications.map((med: Medication) => {
+      const medLogs = logsByMedication[med.id] || [];
+      return {
+        name: med.name,
+        dosage: med.dosage,
+        frequency: 'As needed',
+        type: 'as-needed',
+        expected: null,
+        taken: medLogs.filter((l: MedicationLog) => l.status === 'taken').length,
+        adherence: null, // Not applicable for as-needed
+        durationDays: null,
+        startDate: med.start_date,
+        endDate: med.end_date,
+      };
+    });
+
+    const allMedicationStats = [...medicationStats, ...oneTimeStats, ...asNeededStats];
 
     // Prepare data summary for AI
     const dataSummary = {
@@ -122,11 +210,14 @@ serve(async (req) => {
       startDate,
       endDate,
       totalMedications,
+      prescriptionCount: trackableMedications.length,
+      oneTimeCount: oneTimeMedications.length,
+      asNeededCount: asNeededMedications.length,
       expectedDoses,
       takenDoses,
       missedDoses: expectedDoses - takenDoses,
       adherenceRate,
-      medicationStats,
+      medicationStats: allMedicationStats,
     };
 
     // Generate AI insights
@@ -135,20 +226,38 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Format medication stats for AI prompt
+    const prescriptionBreakdown = medicationStats.map((m: { name: string; dosage: string; taken: number; expected: number; adherence: number }) => 
+      `- ${m.name} (${m.dosage}): ${m.taken}/${m.expected} doses taken (${m.adherence}% adherence)`
+    ).join('\n');
+
+    const oneTimeBreakdown = oneTimeStats.length > 0 
+      ? '\n\nOne-time medications taken:\n' + oneTimeStats.map((m: { name: string; dosage: string; taken: number }) => 
+          `- ${m.name} (${m.dosage}): Taken ${m.taken} time(s)`
+        ).join('\n')
+      : '';
+
+    const asNeededBreakdown = asNeededStats.length > 0 
+      ? '\n\nAs-needed medications:\n' + asNeededStats.map((m: { name: string; dosage: string; taken: number }) => 
+          `- ${m.name} (${m.dosage}): Taken ${m.taken} time(s) during this period`
+        ).join('\n')
+      : '';
+
     const aiPrompt = `You are a friendly health assistant analyzing medication adherence data. Based on the following data, provide helpful insights and recommendations.
 
 Data Summary:
 - Period: ${period} (${periodDays} days from ${startDate} to ${endDate})
-- Total medications being tracked: ${totalMedications}
-- Expected doses: ${expectedDoses}
-- Doses taken: ${takenDoses}
-- Doses missed: ${expectedDoses - takenDoses}
-- Overall adherence rate: ${adherenceRate}%
+- Total medications: ${totalMedications} (${trackableMedications.length} prescriptions, ${oneTimeMedications.length} one-time, ${asNeededMedications.length} as-needed)
+- Prescription adherence is calculated only for regular prescriptions, not one-time or as-needed medications.
+- Expected prescription doses: ${expectedDoses}
+- Prescription doses taken: ${takenDoses}
+- Prescription doses missed: ${expectedDoses - takenDoses}
+- Overall prescription adherence rate: ${adherenceRate}%
 
-Per-medication breakdown:
-${medicationStats.map((m: { name: string; dosage: string; taken: number; expected: number; adherence: number }) => 
-  `- ${m.name} (${m.dosage}): ${m.taken}/${m.expected} doses taken (${m.adherence}% adherence)`
-).join('\n')}
+Prescription medication breakdown:
+${prescriptionBreakdown || 'No prescriptions during this period'}
+${oneTimeBreakdown}
+${asNeededBreakdown}
 
 Please provide:
 1. A brief summary of medication adherence for this period (2-3 sentences)
