@@ -2,3 +2,9 @@ project_id = "ikwlshmadlljfaixhsrx"
 
 [functions.generate-report]
 verify_jwt = false
+
+[functions.access-keys]
+verify_jwt = false
+
+[functions.doctor-access]
+verify_jwt = false
