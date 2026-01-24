@@ -60,11 +60,15 @@ export type Database = {
           color: string | null
           created_at: string
           dosage: string
+          duration_days: number | null
+          end_date: string | null
           frequency: string
           id: string
           instructions: string | null
           is_active: boolean | null
+          medication_type: string
           name: string
+          start_date: string | null
           time_of_day: string[]
           updated_at: string
           user_id: string
@@ -73,11 +77,15 @@ export type Database = {
           color?: string | null
           created_at?: string
           dosage: string
+          duration_days?: number | null
+          end_date?: string | null
           frequency: string
           id?: string
           instructions?: string | null
           is_active?: boolean | null
+          medication_type?: string
           name: string
+          start_date?: string | null
           time_of_day?: string[]
           updated_at?: string
           user_id: string
@@ -86,11 +94,15 @@ export type Database = {
           color?: string | null
           created_at?: string
           dosage?: string
+          duration_days?: number | null
+          end_date?: string | null
           frequency?: string
           id?: string
           instructions?: string | null
           is_active?: boolean | null
+          medication_type?: string
           name?: string
+          start_date?: string | null
           time_of_day?: string[]
           updated_at?: string
           user_id?: string

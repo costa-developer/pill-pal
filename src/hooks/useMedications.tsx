@@ -13,6 +13,10 @@ interface Medication {
   color: string | null;
   is_active: boolean | null;
   created_at: string;
+  medication_type: string;
+  duration_days: number | null;
+  start_date: string | null;
+  end_date: string | null;
 }
 
 interface MedicationLog {
@@ -75,6 +79,10 @@ export function useMedications() {
     time_of_day: string[];
     instructions?: string;
     color: string;
+    medication_type: string;
+    duration_days: number | null;
+    start_date: string;
+    end_date: string | null;
   }) => {
     if (!user) throw new Error('Not authenticated');
 
@@ -86,6 +94,10 @@ export function useMedications() {
       time_of_day: medication.time_of_day,
       instructions: medication.instructions,
       color: medication.color,
+      medication_type: medication.medication_type,
+      duration_days: medication.duration_days,
+      start_date: medication.start_date,
+      end_date: medication.end_date,
     });
 
     if (error) throw error;
