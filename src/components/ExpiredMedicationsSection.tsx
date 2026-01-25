@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { format, formatDistanceToNow } from 'date-fns';
-import { AlertTriangle, RotateCcw, Archive, ChevronDown, ChevronUp, Pill } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { AlertTriangle, RotateCcw, Archive, ChevronDown, ChevronUp, Pill, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -10,7 +10,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -99,54 +98,61 @@ export function ExpiredMedicationsSection({
   };
 
   return (
-    <div className="mb-8 animate-fade-in">
+    <div className="mb-10 animate-fade-in">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-4 bg-warning/10 border border-warning/30 rounded-xl hover:bg-warning/15 transition-colors"
+        className={cn(
+          "w-full flex items-center justify-between p-5 rounded-3xl transition-all duration-300",
+          "bg-gradient-to-r from-amber/10 via-amber/5 to-transparent",
+          "border border-amber/30 hover:border-amber/50",
+          "group"
+        )}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center">
-            <AlertTriangle className="w-5 h-5 text-warning" />
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-amber/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <AlertTriangle className="w-6 h-6 text-amber" />
           </div>
           <div className="text-left">
-            <h3 className="font-display font-semibold text-foreground">
+            <h3 className="font-display font-bold text-lg text-foreground">
               Expired Prescriptions
             </h3>
             <p className="text-sm text-muted-foreground">
-              {medications.length} prescription{medications.length !== 1 ? 's' : ''} need{medications.length === 1 ? 's' : ''} attention
+              {medications.length} prescription{medications.length !== 1 ? 's' : ''} need{medications.length === 1 ? 's' : ''} your attention
             </p>
           </div>
         </div>
-        {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-muted-foreground" />
-        ) : (
-          <ChevronDown className="w-5 h-5 text-muted-foreground" />
-        )}
+        <div className={cn(
+          "w-10 h-10 rounded-xl bg-amber/10 flex items-center justify-center transition-transform",
+          isExpanded && "rotate-180"
+        )}>
+          <ChevronDown className="w-5 h-5 text-amber" />
+        </div>
       </button>
 
       {isExpanded && (
-        <div className="mt-4 space-y-3">
-          {medications.map((med) => (
+        <div className="mt-4 space-y-3 animate-fade-in">
+          {medications.map((med, index) => (
             <div
               key={med.id}
-              className="med-card border-warning/30 bg-card/50"
+              className="bento-card border-amber/20 bg-card/80"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center opacity-60"
-                    style={{ backgroundColor: med.color || '#0077b6' }}
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center opacity-70"
+                    style={{ backgroundColor: `${med.color || '#0077b6'}15` }}
                   >
-                    <Pill className="w-6 h-6 text-white" />
+                    <Pill className="w-7 h-7" style={{ color: med.color || '#0077b6' }} />
                   </div>
                   <div>
-                    <h4 className="font-display font-semibold text-foreground">
+                    <h4 className="font-display font-semibold text-lg text-foreground">
                       {med.name}
                     </h4>
                     <p className="text-sm text-muted-foreground">{med.dosage}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline" className="text-warning border-warning/50">
-                        Expired {med.end_date && formatDistanceToNow(new Date(med.end_date), { addSuffix: true })}
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-amber border-amber/40 bg-amber/10 rounded-full">
+                        ⏰ Expired {med.end_date && formatDistanceToNow(new Date(med.end_date), { addSuffix: true })}
                       </Badge>
                     </div>
                   </div>
@@ -156,7 +162,7 @@ export function ExpiredMedicationsSection({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2"
+                    className="gap-2 rounded-xl border-primary/30 hover:border-primary hover:bg-primary/10"
                     onClick={() => openRenewDialog(med)}
                     disabled={renewingId === med.id}
                   >
@@ -169,24 +175,27 @@ export function ExpiredMedicationsSection({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="gap-2 text-muted-foreground hover:text-foreground"
+                        className="gap-2 text-muted-foreground hover:text-foreground rounded-xl"
                         disabled={archivingId === med.id}
                       >
                         <Archive className="w-4 h-4" />
                         Archive
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="rounded-3xl">
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Archive this prescription?</AlertDialogTitle>
+                        <AlertDialogTitle className="font-display">Archive this prescription?</AlertDialogTitle>
                         <AlertDialogDescription>
                           This will remove "{med.name}" from your active medications. 
                           You can view archived medications in your history.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleArchive(med.id)}>
+                        <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleArchive(med.id)}
+                          className="rounded-xl"
+                        >
                           Archive
                         </AlertDialogAction>
                       </AlertDialogFooter>
@@ -201,40 +210,55 @@ export function ExpiredMedicationsSection({
 
       {/* Renew Dialog */}
       <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
-        <DialogContent>
+        <DialogContent className="rounded-3xl">
           <DialogHeader>
-            <DialogTitle>Renew Prescription</DialogTitle>
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+              <Sparkles className="w-7 h-7 text-primary" />
+            </div>
+            <DialogTitle className="font-display text-xl">Renew Prescription</DialogTitle>
             <DialogDescription>
               Renew "{selectedMedication?.name}" for a new period starting today.
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
-            <label className="text-sm font-medium text-foreground mb-2 block">
-              New Duration
+            <label className="text-sm font-medium text-foreground mb-3 block">
+              Select Duration
             </label>
             <Select value={selectedDuration} onValueChange={setSelectedDuration}>
-              <SelectTrigger>
+              <SelectTrigger className="rounded-xl h-12">
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-xl">
                 {DURATION_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem 
+                    key={option.value} 
+                    value={option.value}
+                    className="rounded-lg"
+                  >
                     {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-sm text-muted-foreground mt-3">
               The prescription will be active from today for {selectedDuration} days.
             </p>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setRenewDialogOpen(false)}>
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setRenewDialogOpen(false)}
+              className="rounded-xl"
+            >
               Cancel
             </Button>
-            <Button onClick={handleRenew} disabled={renewingId !== null}>
+            <Button 
+              onClick={handleRenew} 
+              disabled={renewingId !== null}
+              className="rounded-xl gradient-button text-white"
+            >
               {renewingId ? 'Renewing...' : 'Renew Prescription'}
             </Button>
           </DialogFooter>
