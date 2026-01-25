@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Pill, LogOut, User, Calendar, BarChart3, FileText, Share2 } from 'lucide-react';
+import { Pill, LogOut, User, Calendar, BarChart3, FileText, Share2, Sparkles } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -23,54 +23,76 @@ export function DashboardHeader() {
   const location = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-border/50">
+    <header className="sticky top-0 z-50 glass-strong border-b border-border/30">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/dashboard" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center">
-            <Pill className="w-5 h-5 text-white" />
+        <Link to="/dashboard" className="flex items-center gap-3 group">
+          <div className="relative">
+            <div className="w-11 h-11 rounded-2xl gradient-button flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
+              <Pill className="w-5 h-5 text-white" />
+            </div>
+            {/* Animated glow */}
+            <div className="absolute inset-0 rounded-2xl gradient-button opacity-50 blur-lg group-hover:opacity-70 transition-opacity duration-300" />
           </div>
-          <span className="text-xl font-display font-bold text-foreground hidden sm:block">
-            MediTrack
-          </span>
+          <div className="hidden sm:block">
+            <span className="text-xl font-display font-bold text-foreground">
+              Medi<span className="text-gradient">Track</span>
+            </span>
+            <div className="h-0.5 w-0 group-hover:w-full bg-gradient-to-r from-primary to-accent transition-all duration-300" />
+          </div>
         </Link>
 
-        {/* Navigation */}
-        <nav className="flex items-center gap-1">
-          {NAV_ITEMS.map((item) => (
-            <Link key={item.href} to={item.href}>
-              <Button
-                variant="ghost"
-                className={cn(
-                  'gap-2',
-                  location.pathname === item.href && 'bg-secondary text-primary'
-                )}
-              >
-                <item.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{item.label}</span>
-              </Button>
-            </Link>
-          ))}
+        {/* Navigation Pills */}
+        <nav className="flex items-center">
+          <div className="flex items-center gap-1 p-1 rounded-2xl bg-muted/50 backdrop-blur-sm">
+            {NAV_ITEMS.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link key={item.href} to={item.href}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      'gap-2 rounded-xl transition-all duration-300',
+                      isActive 
+                        ? 'bg-card shadow-md text-foreground font-semibold' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
+                    )}
+                  >
+                    <item.icon className={cn("w-4 h-4", isActive && "text-primary")} />
+                    <span className="hidden sm:inline">{item.label}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <Button 
+              variant="ghost" 
+              className="gap-2 rounded-2xl hover:bg-muted/60 transition-colors group"
+            >
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:from-primary/30 group-hover:to-accent/30 transition-all">
                 <User className="w-4 h-4 text-primary" />
               </div>
-              <span className="hidden sm:inline text-sm font-medium">
+              <span className="hidden sm:inline text-sm font-medium max-w-24 truncate">
                 {user?.email?.split('@')[0]}
               </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem className="text-muted-foreground text-sm">
-              {user?.email}
-            </DropdownMenuItem>
+          <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2">
+            <div className="px-3 py-2 mb-1">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Signed in as</p>
+              <p className="text-sm font-medium truncate">{user?.email}</p>
+            </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
+            <DropdownMenuItem 
+              onClick={signOut} 
+              className="text-destructive focus:text-destructive rounded-xl cursor-pointer"
+            >
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
             </DropdownMenuItem>
