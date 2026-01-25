@@ -6,6 +6,7 @@ import { useMedications } from '@/hooks/useMedications';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { MedicationCard } from '@/components/MedicationCard';
 import { AddMedicationDialog } from '@/components/AddMedicationDialog';
+import { ExpiredMedicationsSection } from '@/components/ExpiredMedicationsSection';
 import { StatsCard } from '@/components/StatsCard';
 import { Pill, CheckCircle2, Clock, CalendarDays, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -15,10 +16,13 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const {
     medications,
+    expiredMedications,
     loading: medsLoading,
     addMedication,
     markAsTaken,
     deleteMedication,
+    renewMedication,
+    archiveMedication,
     isTakenToday,
   } = useMedications();
 
@@ -125,6 +129,13 @@ export default function Dashboard() {
             trend="up"
           />
         </div>
+
+        {/* Expired Prescriptions Section */}
+        <ExpiredMedicationsSection
+          medications={expiredMedications}
+          onRenew={renewMedication}
+          onArchive={archiveMedication}
+        />
 
         {/* Medications Section */}
         <div className="flex items-center justify-between mb-6">

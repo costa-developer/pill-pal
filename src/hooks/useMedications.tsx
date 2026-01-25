@@ -31,6 +31,7 @@ interface MedicationLog {
 export function useMedications() {
   const { user } = useAuth();
   const [medications, setMedications] = useState<Medication[]>([]);
+  const [expiredMedications, setExpiredMedications] = useState<Medication[]>([]);
   const [logs, setLogs] = useState<MedicationLog[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,14 +39,31 @@ export function useMedications() {
     if (!user) return;
     
     try {
-      const { data, error } = await supabase
+      const now = new Date().toISOString();
+      
+      // Fetch active medications (not expired)
+      const { data: activeData, error: activeError } = await supabase
         .from('medications')
         .select('*')
         .eq('is_active', true)
+        .or(`end_date.is.null,end_date.gt.${now}`)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setMedications(data || []);
+      if (activeError) throw activeError;
+      setMedications(activeData || []);
+
+      // Fetch expired prescriptions (end_date passed, still marked active)
+      const { data: expiredData, error: expiredError } = await supabase
+        .from('medications')
+        .select('*')
+        .eq('is_active', true)
+        .eq('medication_type', 'prescription')
+        .not('end_date', 'is', null)
+        .lt('end_date', now)
+        .order('end_date', { ascending: false });
+
+      if (expiredError) throw expiredError;
+      setExpiredMedications(expiredData || []);
     } catch (error) {
       console.error('Error fetching medications:', error);
       toast.error('Failed to load medications');
@@ -128,6 +146,36 @@ export function useMedications() {
     await fetchMedications();
   };
 
+  const renewMedication = async (id: string, durationDays: number) => {
+    if (!user) throw new Error('Not authenticated');
+
+    const newStartDate = new Date();
+    const newEndDate = new Date();
+    newEndDate.setDate(newEndDate.getDate() + durationDays);
+
+    const { error } = await supabase
+      .from('medications')
+      .update({
+        start_date: newStartDate.toISOString(),
+        end_date: newEndDate.toISOString(),
+        duration_days: durationDays,
+      })
+      .eq('id', id);
+
+    if (error) throw error;
+    await fetchMedications();
+  };
+
+  const archiveMedication = async (id: string) => {
+    const { error } = await supabase
+      .from('medications')
+      .update({ is_active: false })
+      .eq('id', id);
+
+    if (error) throw error;
+    await fetchMedications();
+  };
+
   useEffect(() => {
     if (user) {
       setLoading(true);
@@ -148,11 +196,14 @@ export function useMedications() {
 
   return {
     medications,
+    expiredMedications,
     logs,
     loading,
     addMedication,
     markAsTaken,
     deleteMedication,
+    renewMedication,
+    archiveMedication,
     isTakenToday,
     refetch: () => Promise.all([fetchMedications(), fetchTodayLogs()]),
   };
