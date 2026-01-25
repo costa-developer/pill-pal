@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Pill, Heart, Shield, Clock, ChevronRight, CheckCircle2, Bell, BarChart3 } from 'lucide-react';
+import { Pill, Heart, Shield, Clock, ChevronRight, CheckCircle2, Bell, BarChart3, Stethoscope } from 'lucide-react';
 
 export default function Index() {
   const { user, loading } = useAuth();
@@ -26,6 +26,12 @@ export default function Index() {
             <span className="text-xl font-display font-bold text-foreground">MediTrack</span>
           </div>
           <div className="flex items-center gap-3">
+            <Link to="/doctor/auth">
+              <Button variant="ghost" className="gap-2">
+                <Stethoscope className="w-4 h-4" />
+                <span className="hidden sm:inline">Doctor Portal</span>
+              </Button>
+            </Link>
             <Link to="/auth">
               <Button variant="ghost">Sign In</Button>
             </Link>
