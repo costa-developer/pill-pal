@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Pill, LogOut, User, Calendar, BarChart3, FileText } from 'lucide-react';
+import { Pill, LogOut, User, Calendar, BarChart3, FileText, Share2 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Today', icon: Calendar },
   { href: '/history', label: 'History', icon: BarChart3 },
   { href: '/reports', label: 'Reports', icon: FileText },
+  { href: '/sharing', label: 'Sharing', icon: Share2 },
 ];
 
 export function DashboardHeader() {
