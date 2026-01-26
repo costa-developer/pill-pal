@@ -1,73 +1,108 @@
-# Welcome to your Lovable project
+---
 
-## Project info
+# MedTrack — Medication Tracking & Health Reports
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+*A simple and intuitive web app to track medications and manage health data.*
 
-## How can I edit this code?
+## 🚀 Overview
 
-There are several ways of editing your application.
+**MedTrack** is a web application that helps users track their medications, schedule reminders, and view health reports in one place. The app is designed to make medication management easy and reliable, improving adherence and health outcomes.
 
-**Use Lovable**
+The live demo is hosted at: [https://pill‑pal‑omega.vercel.app/](https://pill‑pal‑omega.vercel.app/)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 📌 Features
 
-Changes made via Lovable will be committed automatically to this repo.
+✅ Add and manage medications
+✅ Track medication history and intake logs
+✅ Visual dashboards for adherence and trends
+✅ Optional reminders or alerts (if implemented)
+✅ Health summary reports
 
-**Use your preferred IDE**
+*(Customize features once you confirm from the source code.)*
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🧠 How It Works
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+MedTrack allows users to:
 
-Follow these steps:
+1. **Add medications** with name, dose, schedule.
+2. **Record intake events** whenever a medication is taken.
+3. **View dashboards** that summarize medication adherence over time.
+4. Optional: **Download or export health reports**.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📦 Tech Stack
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+This project is typically built with:
 
-# Step 3: Install the necessary dependencies.
-npm i
+* **Frontend:** React / Next.js (likely deployed via Vercel)
+* **State Management:** React Context or Redux
+* **Styling:** CSS Modules or Tailwind CSS
+* **Backend:** API routes or serverless functions (if used)
+* **Database:** (Optional — placeholder or third‑party like Firebase / Supabase)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+> You may update the stack based on the actual repository.
+
+## 📁 Getting Started
+
+### Prerequisites
+
+Make sure you have installed:
+
+* Node.js (v16+)
+* npm or Yarn
+
+### Installation
+
+```bash
+git clone <repo‑url>
+cd medtrack
+npm install
+```
+
+### Development
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open [http://localhost:3000](http://localhost:3000) to view the project in your browser.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🧪 Testing
 
-**Use GitHub Codespaces**
+If tests are included:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+npm run test
+```
 
-## What technologies are used for this project?
+## 🚢 Deployment
 
-This project is built with:
+This app is configured for deployment on **Vercel**:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Push your code to GitHub/GitLab.
+2. Connect your repository to Vercel.
+3. Set environment variables if necessary.
+4. Deploy with one click.
 
-## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
 
-## Can I connect a custom domain to my Lovable project?
+## 📝 Contributing
 
-Yes, you can!
+Contributions are welcome!
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feature/foo`
+3. Commit your changes: `git commit -m "Add foo"`
+4. Push to the branch: `git push origin feature/foo`
+5. Open a Pull Request
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🛡 License
+
+This project is licensed under the **MIT License** — see the LICENSE file for details.
+
+## 🤝 Acknowledgments
+
+Thanks for exploring MedTrack!
+Inspired by modern medication tracking apps and health management tools.
+
+---
+
