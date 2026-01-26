@@ -92,7 +92,7 @@ export default function Dashboard() {
   );
 
   const greeting = getTimeOfDay();
-  const userName = user.email?.split('@')[0] || 'there';
+  const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'there';
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
