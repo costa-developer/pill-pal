@@ -1,5 +1,7 @@
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Pill, LogOut, User, Calendar, BarChart3, FileText, Share2, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -20,7 +22,11 @@ const NAV_ITEMS = [
 
 export function DashboardHeader() {
   const { user, signOut } = useAuth();
+  const { profile } = useProfile();
   const location = useLocation();
+
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0];
+  const initials = displayName?.slice(0, 2).toUpperCase() || 'U';
 
   return (
     <header className="sticky top-0 z-50 glass-strong border-b border-border/30">
@@ -75,11 +81,18 @@ export function DashboardHeader() {
               variant="ghost" 
               className="gap-2 rounded-2xl hover:bg-muted/60 transition-colors group"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:from-primary/30 group-hover:to-accent/30 transition-all">
-                <User className="w-4 h-4 text-primary" />
-              </div>
+              <Avatar className="w-9 h-9 rounded-xl ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
+                <AvatarImage 
+                  src={profile?.avatar_url || undefined} 
+                  alt={displayName || 'User avatar'} 
+                  className="object-cover"
+                />
+                <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 text-primary text-sm font-medium">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
               <span className="hidden sm:inline text-sm font-medium max-w-24 truncate">
-                {user?.email?.split('@')[0]}
+                {displayName}
               </span>
             </Button>
           </DropdownMenuTrigger>
