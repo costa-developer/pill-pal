@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Pill, LogOut, User, Calendar, BarChart3, FileText, Share2, Sparkles } from 'lucide-react';
+import { Pill, LogOut, User, Calendar, BarChart3, FileText, Share2, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -88,6 +88,13 @@ export function DashboardHeader() {
               <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Signed in as</p>
               <p className="text-sm font-medium truncate">{user?.email}</p>
             </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+              <Link to="/settings" className="flex items-center">
+                <Settings className="w-4 h-4 mr-2" />
+                Profile Settings
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               onClick={signOut} 

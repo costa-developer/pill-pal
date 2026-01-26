@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import Reports from "./pages/Reports";
 import Sharing from "./pages/Sharing";
+import Settings from "./pages/Settings";
 import DoctorAuth from "./pages/DoctorAuth";
 import DoctorPortal from "./pages/DoctorPortal";
 import NotFound from "./pages/NotFound";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/history" element={<History />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/sharing" element={<Sharing />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/doctor/auth" element={<DoctorAuth />} />
             <Route path="/doctor" element={<DoctorPortal />} />
             <Route path="*" element={<NotFound />} />
