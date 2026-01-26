@@ -278,8 +278,26 @@ export default function Reports() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-sm max-w-none text-foreground">
-                  <div className="whitespace-pre-wrap">{reportData.aiInsights}</div>
+                <div className="space-y-4 text-foreground">
+                  {reportData.aiInsights.split('\n\n').map((paragraph, index) => {
+                    // Check if this is a section header (all caps or ends with colon)
+                    const isHeader = /^[A-Z\s]+$/.test(paragraph.trim()) || 
+                                     (paragraph.length < 30 && paragraph.trim().endsWith(':'));
+                    
+                    if (isHeader) {
+                      return (
+                        <h4 key={index} className="font-display font-semibold text-primary pt-2 first:pt-0">
+                          {paragraph.trim().replace(/:$/, '')}
+                        </h4>
+                      );
+                    }
+                    
+                    return (
+                      <p key={index} className="leading-relaxed text-muted-foreground">
+                        {paragraph.trim()}
+                      </p>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>

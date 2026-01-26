@@ -259,13 +259,27 @@ ${prescriptionBreakdown || 'No prescriptions during this period'}
 ${oneTimeBreakdown}
 ${asNeededBreakdown}
 
-Please provide:
-1. A brief summary of medication adherence for this period (2-3 sentences)
-2. Key observations about patterns (e.g., any medications with notably low adherence)
-3. 2-3 personalized, encouraging recommendations to improve adherence
-4. A motivational note based on their performance
+IMPORTANT FORMATTING RULES:
+- Do NOT use any markdown formatting like **, ***, ##, ###, or bullet points with -
+- Write in plain text with clear paragraph breaks
+- Use simple numbered lists (1. 2. 3.) when listing items
+- Separate sections with a blank line
 
-Keep the tone warm, supportive, and non-judgmental. Format your response in clear sections.`;
+Please provide the following in plain text format:
+
+SUMMARY
+Write 2-3 sentences summarizing medication adherence for this period.
+
+KEY OBSERVATIONS  
+Describe patterns you notice, such as medications with notably low adherence or consistent performance.
+
+RECOMMENDATIONS
+Provide 2-3 personalized, encouraging recommendations to improve adherence. Number them 1, 2, 3.
+
+ENCOURAGEMENT
+End with a warm, motivational note based on their performance.
+
+Keep the tone warm, supportive, and non-judgmental.`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -276,7 +290,7 @@ Keep the tone warm, supportive, and non-judgmental. Format your response in clea
       body: JSON.stringify({
         model: 'google/gemini-3-flash-preview',
         messages: [
-          { role: 'system', content: 'You are a compassionate health assistant helping users manage their medication schedules. Be encouraging and supportive.' },
+          { role: 'system', content: 'You are a compassionate health assistant helping users manage their medication schedules. Be encouraging and supportive. NEVER use markdown formatting like **, ***, ##, or ### in your responses. Write in plain, clean text only.' },
           { role: 'user', content: aiPrompt },
         ],
       }),
