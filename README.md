@@ -1,4 +1,3 @@
-cat > README.md << 'EOF'
 # MedTrack — Medication Tracking & Health Reports  
 *A simple and intuitive web app to track medications and manage health data.*
 
