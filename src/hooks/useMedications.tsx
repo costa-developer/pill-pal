@@ -136,6 +136,40 @@ export function useMedications() {
     await fetchTodayLogs();
   };
 
+  const updateMedication = async (id: string, medication: {
+    name: string;
+    dosage: string;
+    frequency: string;
+    time_of_day: string[];
+    instructions?: string;
+    color: string;
+    medication_type: string;
+    duration_days: number | null;
+    start_date: string;
+    end_date: string | null;
+  }) => {
+    if (!user) throw new Error('Not authenticated');
+
+    const { error } = await supabase
+      .from('medications')
+      .update({
+        name: medication.name,
+        dosage: medication.dosage,
+        frequency: medication.frequency,
+        time_of_day: medication.time_of_day,
+        instructions: medication.instructions,
+        color: medication.color,
+        medication_type: medication.medication_type,
+        duration_days: medication.duration_days,
+        start_date: medication.start_date,
+        end_date: medication.end_date,
+      })
+      .eq('id', id);
+
+    if (error) throw error;
+    await fetchMedications();
+  };
+
   const deleteMedication = async (id: string) => {
     const { error } = await supabase
       .from('medications')
@@ -200,6 +234,7 @@ export function useMedications() {
     logs,
     loading,
     addMedication,
+    updateMedication,
     markAsTaken,
     deleteMedication,
     renewMedication,

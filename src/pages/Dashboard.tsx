@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
@@ -6,9 +6,10 @@ import { useMedications } from '@/hooks/useMedications';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { MedicationCard } from '@/components/MedicationCard';
 import { AddMedicationDialog } from '@/components/AddMedicationDialog';
+import { EditMedicationDialog } from '@/components/EditMedicationDialog';
 import { ExpiredMedicationsSection } from '@/components/ExpiredMedicationsSection';
 import { StatsCard } from '@/components/StatsCard';
-import { Pill, CheckCircle2, Clock, CalendarDays, Loader2, Zap, TrendingUp } from 'lucide-react';
+import { Pill, CheckCircle2, Clock, Loader2, Zap, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
@@ -19,12 +20,16 @@ export default function Dashboard() {
     expiredMedications,
     loading: medsLoading,
     addMedication,
+    updateMedication,
     markAsTaken,
     deleteMedication,
     renewMedication,
     archiveMedication,
     isTakenToday,
   } = useMedications();
+
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [medicationToEdit, setMedicationToEdit] = useState<typeof medications[0] | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -76,7 +81,11 @@ export default function Dashboard() {
   };
 
   const handleEdit = (id: string) => {
-    toast.info('Edit functionality coming soon!');
+    const med = medications.find((m) => m.id === id);
+    if (med) {
+      setMedicationToEdit(med);
+      setEditDialogOpen(true);
+    }
   };
 
   // Group medications by time
@@ -256,6 +265,14 @@ export default function Dashboard() {
               })}
           </div>
         )}
+
+        {/* Edit Medication Dialog */}
+        <EditMedicationDialog
+          medication={medicationToEdit}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onUpdate={updateMedication}
+        />
       </main>
     </div>
   );
