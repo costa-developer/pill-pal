@@ -2,7 +2,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Pill, LogOut, User, Calendar, BarChart3, FileText, Share2, Settings } from 'lucide-react';
+import { Pill, LogOut, Calendar, CalendarDays, BarChart3, FileText, Share2, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Today', icon: Calendar },
+  { href: '/calendar', label: 'Week', icon: CalendarDays },
   { href: '/history', label: 'History', icon: BarChart3 },
   { href: '/reports', label: 'Reports', icon: FileText },
   { href: '/sharing', label: 'Sharing', icon: Share2 },
