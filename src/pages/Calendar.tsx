@@ -17,9 +17,7 @@ export default function Calendar() {
   const navigate = useNavigate();
   const { medications, logs, loading: medsLoading } = useMedications();
   const { profile } = useProfile();
-  const [currentWeekStart, setCurrentWeekStart] = useState(() =>
-    startOfWeek(new Date(), { weekStartsOn: 1 }) // Start week on Monday
-  );
+  const [currentDate, setCurrentDate] = useState(() => new Date());
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -42,21 +40,22 @@ export default function Calendar() {
 
   if (!user) return null;
 
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
+  // Calculate the week starting from 3 days before current date (centered view)
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentDate, i - 3));
 
-  const goToPreviousWeek = () => {
-    setCurrentWeekStart(prev => addDays(prev, -7));
+  const goToPreviousDay = () => {
+    setCurrentDate(prev => addDays(prev, -1));
   };
 
-  const goToNextWeek = () => {
-    setCurrentWeekStart(prev => addDays(prev, 7));
+  const goToNextDay = () => {
+    setCurrentDate(prev => addDays(prev, 1));
   };
 
-  const goToCurrentWeek = () => {
-    setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const goToToday = () => {
+    setCurrentDate(new Date());
   };
 
-  const isCurrentWeek = isSameDay(currentWeekStart, startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const isViewingToday = isSameDay(currentDate, new Date());
 
   const handleExportPDF = () => {
     try {
@@ -116,7 +115,7 @@ export default function Calendar() {
             <Button
               variant="outline"
               size="icon"
-              onClick={goToPreviousWeek}
+              onClick={goToPreviousDay}
               className="rounded-xl"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -124,15 +123,15 @@ export default function Calendar() {
             <Button
               variant="outline"
               size="icon"
-              onClick={goToNextWeek}
+              onClick={goToNextDay}
               className="rounded-xl"
             >
               <ChevronRight className="w-5 h-5" />
             </Button>
-            {!isCurrentWeek && (
+            {!isViewingToday && (
               <Button
                 variant="ghost"
-                onClick={goToCurrentWeek}
+                onClick={goToToday}
                 className="rounded-xl text-primary"
               >
                 Today
@@ -140,7 +139,7 @@ export default function Calendar() {
             )}
           </div>
           <div className="text-lg font-display font-semibold text-foreground">
-            {format(currentWeekStart, 'MMM d')} - {format(addDays(currentWeekStart, 6), 'MMM d, yyyy')}
+            {format(weekDays[0], 'MMM d')} - {format(weekDays[6], 'MMM d, yyyy')}
           </div>
         </div>
 
