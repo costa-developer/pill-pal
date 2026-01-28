@@ -3,17 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { format, startOfWeek, addDays, isSameDay, isToday } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
 import { useMedications } from '@/hooks/useMedications';
+import { useProfile } from '@/hooks/useProfile';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { WeeklyCalendarView } from '@/components/WeeklyCalendarView';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, CalendarDays, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarDays, Loader2, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { generateWeeklyCalendarPDF } from '@/lib/calendarPdfGenerator';
+import { toast } from 'sonner';
 
 export default function Calendar() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const { medications, logs, loading: medsLoading, isTakenToday } = useMedications();
-  const [currentWeekStart, setCurrentWeekStart] = useState(() => 
+  const { medications, logs, loading: medsLoading } = useMedications();
+  const { profile } = useProfile();
+  const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 }) // Start week on Monday
   );
 
@@ -54,6 +58,21 @@ export default function Calendar() {
 
   const isCurrentWeek = isSameDay(currentWeekStart, startOfWeek(new Date(), { weekStartsOn: 1 }));
 
+  const handleExportPDF = () => {
+    try {
+      const filename = generateWeeklyCalendarPDF({
+        medications,
+        weekDays,
+        logs,
+        userName: profile?.full_name || undefined,
+      });
+      toast.success(`Calendar exported as ${filename}`);
+    } catch (error) {
+      console.error('Failed to export PDF:', error);
+      toast.error('Failed to export calendar');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Background decorative elements */}
@@ -66,18 +85,28 @@ export default function Calendar() {
       <main className="container mx-auto px-4 py-8 relative z-10">
         {/* Header Section */}
         <div className="mb-8 animate-slide-up">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl gradient-button flex items-center justify-center">
-              <CalendarDays className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl gradient-button flex items-center justify-center">
+                <CalendarDays className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground">
+                  Weekly Schedule
+                </h1>
+                <p className="text-muted-foreground">
+                  View your medication schedule for the week
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground">
-                Weekly Schedule
-              </h1>
-              <p className="text-muted-foreground">
-                View your medication schedule for the week
-              </p>
-            </div>
+            <Button
+              onClick={handleExportPDF}
+              className="gradient-button rounded-xl gap-2"
+              disabled={medications.length === 0}
+            >
+              <Download className="w-4 h-4" />
+              Export PDF
+            </Button>
           </div>
         </div>
 
